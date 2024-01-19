@@ -24,8 +24,16 @@ print('MONGO: ', mongo.db)
 @app.route("/")
 @app.route("/get_tasks")
 def get_tasks():
-    tasks = mongo.db.tasks.find()
+    tasks = list(mongo.db.tasks.find())
     return render_template("tasks.html", tasks=tasks)
+
+
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    query= request.form.get("query")
+    tasks=list(mongo.db.tasks.find({"$text":{"$search":query}}))
+    return render_template("tasks.html", tasks=tasks)
+
 
 
 
@@ -152,6 +160,7 @@ def delete_task(task_id):
 def get_categories():
     category = list(mongo.db.catagories.find().sort("category_name", 1))
     return render_template("categories.html", category=category)
+
 
 
 @app.route("/add_category", methods=["GET", "POST"])
